@@ -1,5 +1,5 @@
-extern crate ddsfile;
-use ddsfile::*;
+extern crate dds;
+use dds::*;
 
 use std::env;
 use std::fs::File;

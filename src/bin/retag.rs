@@ -1,9 +1,9 @@
 // This is for re-tagging the format of a file that is tagged wrong.
 // The data is not converted in any way.
 
-extern crate ddsfile;
+extern crate dds;
 
-use ddsfile::*;
+use dds::*;
 
 use std::env;
 use std::fs::OpenOptions;
@@ -12,7 +12,7 @@ use std::io::{Seek, SeekFrom};
 fn main() {
     let filename = match env::args().nth(1) {
         Some(arg) => arg,
-        None => panic!("Usage: retag <ddsfile> <format>"),
+        None => panic!("Usage: retag <dds> <format>"),
     };
 
     let tag = match env::args().nth(2) {
