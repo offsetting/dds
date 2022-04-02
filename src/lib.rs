@@ -25,8 +25,8 @@
 #[macro_use]
 extern crate bitflags;
 
-//#[cfg(test)]
-//mod tests;
+#[cfg(test)]
+mod tests;
 
 mod error;
 pub use error::*;
@@ -52,16 +52,6 @@ pub struct Dds {
     pub data: Vec<u8>,
 }
 
-/// Parameters for Dds::new_d3d()
-pub struct NewD3dParams {
-    pub height: u32,
-    pub width: u32,
-    pub depth: Option<u32>,
-    pub format: D3DFormat,
-    pub mipmap_levels: Option<u32>,
-    pub caps2: Option<Caps2>,
-}
-
 /// Parameters for Dds::new_dxgi()
 pub struct NewDxgiParams {
     pub height: u32,
@@ -76,40 +66,50 @@ pub struct NewDxgiParams {
     pub alpha_mode: AlphaMode,
 }
 
+fn get_data_size<T: DataFormat>(
+    format: T,
+    width: u32,
+    height: u32,
+    depth: Option<u32>,
+    mipmap_levels: Option<u32>,
+) -> Result<u32, Error> {
+    let size = match get_texture_size(
+        format.get_pitch(width),
+        None,
+        format.get_pitch_height(),
+        height,
+        depth,
+    ) {
+        Some(s) => s,
+        None => return Err(Error::UnsupportedFormat),
+    };
+
+    let mml = mipmap_levels.unwrap_or(1);
+    let min_mipmap_size = match format.get_minimum_mipmap_size_in_bytes() {
+        Some(mms) => mms,
+        None => return Err(Error::UnsupportedFormat),
+    };
+    let array_stride = get_array_stride(size, min_mipmap_size, mml);
+
+    Ok(array_stride)
+}
+
 impl Dds {
     const MAGIC: u32 = 0x20534444; // b"DDS " in little endian
 
     /// Create a new DirectDraw Surface with a D3DFormat
-    pub fn new_d3d(params: NewD3dParams) -> Result<Dds, Error> {
-        let size = match get_texture_size(
-            params.format.get_pitch(params.width),
-            None,
-            params.format.get_pitch_height(),
-            params.height,
-            params.depth,
-        ) {
-            Some(s) => s,
-            None => return Err(Error::UnsupportedFormat),
-        };
-
-        let mml = params.mipmap_levels.unwrap_or(1);
-        let min_mipmap_size = match params.format.get_minimum_mipmap_size_in_bytes() {
-            Some(mms) => mms,
-            None => return Err(Error::UnsupportedFormat),
-        };
-        let array_stride = get_array_stride(size, min_mipmap_size, mml);
-
-        let data_size = array_stride;
+    pub fn new_d3d(
+        format: D3DFormat,
+        width: u32,
+        height: u32,
+        depth: Option<u32>,
+        mipmap_levels: Option<u32>,
+        caps2: Option<Caps2>,
+    ) -> Result<Dds, Error> {
+        let data_size = get_data_size(format, width, height, depth, mipmap_levels)?;
 
         Ok(Dds {
-            header: Header::new_d3d(
-                params.height,
-                params.width,
-                params.depth,
-                params.format,
-                params.mipmap_levels,
-                params.caps2,
-            )?,
+            header: Header::new_d3d(height, width, depth, format, mipmap_levels, caps2)?,
             header10: None,
             data: vec![0; data_size as usize],
         })
