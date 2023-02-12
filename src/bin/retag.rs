@@ -7,7 +7,7 @@ use dds::*;
 
 use std::env;
 use std::fs::OpenOptions;
-use std::io::{Seek, SeekFrom};
+use std::io::Seek;
 
 fn main() {
     let filename = match env::args().nth(1) {
@@ -48,12 +48,12 @@ fn main() {
         panic!("d3d formats not implemented");
     }
 
-    if let Err(e) = file.seek(SeekFrom::Start(0)) {
-        panic!("Error seeking to start of output file: {:?}", e);
+    if let Err(e) = file.rewind() {
+        panic!("Error seeking to start of output file: {e:?}");
     }
 
     if let Err(e) = dds.write(&mut file) {
-        panic!("Error writing file: {:?}", e);
+        panic!("Error writing file: {e:?}");
     }
 
     println!("Done.");

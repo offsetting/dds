@@ -410,17 +410,17 @@ impl fmt::Debug for Dds {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         writeln!(f, "Dds:")?;
         if let Some(d3dformat) = self.get_d3d_format() {
-            writeln!(f, "  Format: {:?}", d3dformat)?;
+            writeln!(f, "  Format: {d3dformat:?}")?;
         } else if let Some(dxgiformat) = self.get_dxgi_format() {
-            writeln!(f, "  Format: {:?}", dxgiformat)?;
+            writeln!(f, "  Format: {dxgiformat:?}")?;
         } else if let Some(ref fourcc) = self.header.spf.fourcc {
-            writeln!(f, "  Format: FOURCC={:?} (Unknown)", fourcc)?;
+            writeln!(f, "  Format: FOURCC={fourcc:?} (Unknown)")?;
         } else {
             writeln!(f, "  Format UNSPECIFIED")?;
         }
         write!(f, "{:?}", self.header)?;
         if let Some(ref h10) = self.header10 {
-            write!(f, "{:?}", h10)?;
+            write!(f, "{h10:?}")?;
         }
         writeln!(f, "  (data elided)")?;
         Ok(())

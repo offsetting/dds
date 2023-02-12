@@ -37,11 +37,11 @@ pub enum Error {
 impl fmt::Display for Error {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         match *self {
-            Error::Fmt(ref e) => write!(f, "{}", e),
-            Error::Io(ref e) => write!(f, "{}", e),
-            Error::General(ref s) => write!(f, "General Error: {}", s),
+            Error::Fmt(ref e) => write!(f, "{e}"),
+            Error::Io(ref e) => write!(f, "{e}"),
+            Error::General(ref s) => write!(f, "General Error: {s}"),
             Error::BadMagicNumber => write!(f, "Bad Magic Number"),
-            Error::InvalidField(ref s) => write!(f, "Invalid Field: {}", s),
+            Error::InvalidField(ref s) => write!(f, "Invalid Field: {s}"),
             Error::ShortFile => write!(f, "File is cut short"),
             Error::UnsupportedFormat => {
                 write!(f, "Format is not supported well enough for this operation")

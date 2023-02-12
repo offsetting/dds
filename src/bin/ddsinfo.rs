@@ -20,5 +20,5 @@ fn main() {
         Err(e) => panic!("{}", e),
     };
 
-    println!("{:?}", dds);
+    println!("{dds:?}");
 }
